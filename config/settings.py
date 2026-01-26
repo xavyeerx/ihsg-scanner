@@ -8,7 +8,7 @@ import os
 # For Railway: set these as environment variables
 # For local development: values below are used as fallback
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8421417558:AAGSldYyzkQ59uxpuPeGIaz8sW_GUtISSq8")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "1342806965")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003752913925")
 
 # === SUPERTREND SETTINGS ===
 # Same as Pine Script v3

@@ -19,6 +19,11 @@ from database.state_manager import StateManager
 from notifications.telegram_bot import send_all_alerts, send_startup_message, send_daily_recap_message
 
 # Setup logging
+# Ensure directories exist BEFORE setting up file handlers
+import os
+os.makedirs('logs', exist_ok=True)
+os.makedirs('database', exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

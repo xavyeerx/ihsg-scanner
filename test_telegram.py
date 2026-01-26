@@ -1,8 +1,11 @@
 # Quick Telegram Test
 import requests
+import sys
+sys.path.insert(0, '.')
+from config.settings import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 
-BOT_TOKEN = "8421417558:AAGSldYyzkQ59uxpuPeGIaz8sW_GUtISSq8"
-CHAT_ID = "1342806965"
+BOT_TOKEN = TELEGRAM_BOT_TOKEN
+CHAT_ID = TELEGRAM_CHAT_ID
 
 message = """🧪 TEST MESSAGE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
