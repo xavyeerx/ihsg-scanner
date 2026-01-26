@@ -1,0 +1,69 @@
+# ============================================
+# IHSG SUPERTREND SCANNER - SETTINGS
+# ============================================
+
+import os
+
+# === TELEGRAM CONFIGURATION ===
+# For Railway: set these as environment variables
+# For local development: values below are used as fallback
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8421417558:AAGSldYyzkQ59uxpuPeGIaz8sW_GUtISSq8")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "1342806965")
+
+# === SUPERTREND SETTINGS ===
+# Same as Pine Script v3
+SUPERTREND_PERIOD = 10
+SUPERTREND_MULTIPLIER = 3.0
+
+# === EMA SETTINGS ===
+EMA_FAST = 20
+EMA_MEDIUM = 50
+EMA_SLOW = 200
+
+# === VOLUME SETTINGS ===
+VOLUME_PERIOD = 20
+VOLUME_SPIKE_THRESHOLD = 1.5
+UNUSUAL_VOLUME_THRESHOLD = 2.5
+
+# === STOCHASTIC RSI SETTINGS ===
+RSI_PERIOD = 14
+STOCH_PERIOD = 14
+SMOOTH_K = 3
+SMOOTH_D = 3
+STOCH_OVERBOUGHT = 80
+STOCH_OVERSOLD = 20
+
+# === ATR & ADX SETTINGS ===
+ATR_PERIOD = 14
+ATR_MULTIPLIER = 1.5
+ADX_PERIOD = 14
+ADX_THRESHOLD = 25
+
+# === DCA SETTINGS ===
+FIB_LEVEL_1 = 61.8  # First DCA zone
+FIB_LEVEL_2 = 85.0  # Second DCA zone (deeper)
+DCA_LOOKBACK = 20
+DCA_VOLUME_THRESHOLD = 0.7  # Healthy correction = vol < 70% avg
+
+# === SCORING THRESHOLDS ===
+BUY_THRESHOLD = 60
+ACCUMULATE_THRESHOLD = 60
+HOLD_THRESHOLD = 45
+
+# === SCANNER SETTINGS ===
+SCAN_INTERVAL_MINUTES = 5  # Scan every 5 minutes
+DATA_PERIOD = "120d"  # Historical data to fetch (need more for daily TF)
+DATA_INTERVAL = "1d"  # DAILY candlestick for ALL signals
+
+# === TRADING HOURS (WIB) ===
+TRADING_START_HOUR = 9
+TRADING_START_MINUTE = 0
+TRADING_END_HOUR = 16
+TRADING_END_MINUTE = 0
+
+# === LOGIC SETTINGS ===
+MIN_DAILY_TURNOVER = 5_000_000_000  # 5 Miliar (Billion) IDR
+
+# === FILE PATHS ===
+STATE_FILE = "database/stock_states.json"
+LOG_FILE = "logs/scanner.log"
