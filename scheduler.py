@@ -60,7 +60,7 @@ def main():
     logger.info("="*50)
     logger.info("IHSG SUPERTREND SCANNER - SCHEDULER")
     logger.info("="*50)
-    logger.info("Scan interval: 5 minutes")
+    logger.info("Scan interval: 1 minute")
     logger.info("Trading hours: 09:00 - 16:00 WIB")
     logger.info("="*50)
     
@@ -74,9 +74,9 @@ def main():
     logger.info("Running initial scan...")
     run_scan(state_manager, force=True)
     
-    # Schedule scans every 5 minutes
-    # Run at :00, :05, :10, :15, :20, :25, :30, :35, :40, :45, :50, :55
-    for minute in range(0, 60, 5):
+    # Schedule scans every 1 minute
+    # Run at :00, :01, :02, ... :59
+    for minute in range(0, 60, 1):
         schedule.every().hour.at(f":{minute:02d}").do(scheduled_scan)
     
     logger.info("Scheduler started. Waiting for next scan...")

@@ -51,7 +51,7 @@ ACCUMULATE_THRESHOLD = 60
 HOLD_THRESHOLD = 45
 
 # === SCANNER SETTINGS ===
-SCAN_INTERVAL_MINUTES = 5  # Scan every 5 minutes
+SCAN_INTERVAL_MINUTES = 1  # Scan every 1 minute
 DATA_PERIOD = "120d"  # Historical data to fetch (need more for daily TF)
 DATA_INTERVAL = "1d"  # DAILY candlestick for ALL signals
 
