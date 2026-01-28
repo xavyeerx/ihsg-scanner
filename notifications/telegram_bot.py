@@ -367,3 +367,98 @@ def send_daily_recap_message(daily_summary: dict):
     
     message = "\n".join(lines)
     send_telegram_message(message)
+
+
+def send_morning_recap_message(signals: dict):
+    """
+    Send morning recap message at 08:00 with ALL stocks matching screener criteria.
+    
+    Args:
+        signals: Dictionary with categories and list of ScanResult objects
+            {'strong_buy': [...], 'accumulation': [...], 'bullish': [...], 'early_entry': [...], 'stoch_crossover': [...], 'bearish_watch': [...]}
+    """
+    lines = [
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        "☀️ <b>MORNING SCAN - 08:00</b>",
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        f"⏰ {get_current_time_wib()}",
+        ""
+    ]
+    
+    total_signals = 0
+    
+    # Strong Buy (highest priority)
+    strong_buy = signals.get('strong_buy', [])
+    if strong_buy:
+        lines.append(f"🔥 <b>STRONG BUY</b> ({len(strong_buy)} saham)")
+        for r in strong_buy[:10]:  # Limit to 10
+            ticker_clean = r.ticker.replace('.JK', '')
+            lines.append(f"   • {ticker_clean} | {r.price:,.0f} | Score: {r.score}")
+        if len(strong_buy) > 10:
+            lines.append(f"   ... dan {len(strong_buy) - 10} lainnya")
+        lines.append("")
+        total_signals += len(strong_buy)
+    
+    # Accumulation
+    acc = signals.get('accumulation', [])
+    if acc:
+        lines.append(f"🔵 <b>ACCUMULATION</b> ({len(acc)} saham)")
+        for r in acc[:10]:
+            ticker_clean = r.ticker.replace('.JK', '')
+            lines.append(f"   • {ticker_clean} | {r.price:,.0f} | Score: {r.score}")
+        if len(acc) > 10:
+            lines.append(f"   ... dan {len(acc) - 10} lainnya")
+        lines.append("")
+        total_signals += len(acc)
+    
+    # Bullish
+    bullish = signals.get('bullish', [])
+    if bullish:
+        lines.append(f"🟢 <b>BULLISH</b> ({len(bullish)} saham)")
+        tickers = [r.ticker.replace('.JK', '') for r in bullish[:15]]
+        lines.append(f"   {', '.join(tickers)}")
+        if len(bullish) > 15:
+            lines.append(f"   ... dan {len(bullish) - 15} lainnya")
+        lines.append("")
+        total_signals += len(bullish)
+    
+    # Early Entry (Serok Bawah)
+    early = signals.get('early_entry', [])
+    if early:
+        lines.append(f"🎯 <b>EARLY ENTRY</b> ({len(early)} saham)")
+        for r in early[:8]:
+            ticker_clean = r.ticker.replace('.JK', '')
+            lines.append(f"   • {ticker_clean} | {r.price:,.0f} | Koreksi: {r.correction_percent:.1f}%")
+        if len(early) > 8:
+            lines.append(f"   ... dan {len(early) - 8} lainnya")
+        lines.append("")
+        total_signals += len(early)
+    
+    # Stoch Crossover
+    stoch = signals.get('stoch_crossover', [])
+    if stoch:
+        lines.append(f"📈 <b>STOCH CROSSOVER</b> ({len(stoch)} saham)")
+        tickers = [r.ticker.replace('.JK', '') for r in stoch[:15]]
+        lines.append(f"   {', '.join(tickers)}")
+        if len(stoch) > 15:
+            lines.append(f"   ... dan {len(stoch) - 15} lainnya")
+        lines.append("")
+        total_signals += len(stoch)
+    
+    # Bearish Watch (warning)
+    bearish = signals.get('bearish_watch', [])
+    if bearish:
+        lines.append(f"⚠️ <b>BEARISH WATCH</b> ({len(bearish)} saham)")
+        tickers = [r.ticker.replace('.JK', '') for r in bearish[:10]]
+        lines.append(f"   {', '.join(tickers)}")
+        lines.append("")
+        total_signals += len(bearish)
+    
+    # Footer
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(f"📊 Total: {total_signals} saham dalam radar")
+    lines.append("💡 <i>Scan lengkap sebelum market buka</i>")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    
+    message = "\n".join(lines)
+    send_telegram_message(message)

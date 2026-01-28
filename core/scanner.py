@@ -264,6 +264,67 @@ def filter_signals(results: Dict[str, ScanResult]) -> Dict[str, List[ScanResult]
     return signals
 
 
+def filter_all_current_signals(results: Dict[str, ScanResult]) -> Dict[str, List[ScanResult]]:
+    """
+    Filter stocks by their CURRENT status for morning recap.
+    Unlike filter_signals which looks for transitions, this shows ALL stocks
+    that are currently in a favorable state.
+    
+    Categories:
+    - strong_buy: Score >= 7, Bullish, High volume
+    - accumulation: Is accumulation signal OR (Bullish + score >= 5)
+    - bullish: Currently bullish but not in above categories
+    - early_entry: Early entry signal detected
+    - bearish_break: Just broke bearish (warning)
+    
+    Returns:
+        Dictionary with categories and list of results
+    """
+    categories = {
+        'strong_buy': [],      # Best picks - high score, bullish, volume
+        'accumulation': [],    # ACC signal or good setup
+        'bullish': [],         # Currently bullish
+        'early_entry': [],     # Serok bawah opportunities  
+        'stoch_crossover': [], # Stoch RSI crossover
+        'bearish_watch': []    # Just broke bearish - caution
+    }
+    
+    for ticker, result in results.items():
+        # Only process signals if stock is liquid (> 5B turnover)
+        if result.avg_turnover_5d < MIN_DAILY_TURNOVER:
+            continue
+        
+        # Strong Buy: Score >= 7, Bullish, Volume ratio > 1.5
+        if result.is_bullish and result.score >= 7 and result.volume_ratio >= 1.5:
+            categories['strong_buy'].append(result)
+        # Accumulation: ACC signal or (Bullish + Score >= 5)
+        elif result.is_accumulation:
+            categories['accumulation'].append(result)
+        elif result.is_bullish and result.score >= 5:
+            categories['accumulation'].append(result)
+        # Bullish: Currently bullish with decent score
+        elif result.is_bullish and result.score >= 3:
+            categories['bullish'].append(result)
+        
+        # Early Entry (can overlap with above)
+        if result.is_early_entry:
+            categories['early_entry'].append(result)
+        
+        # Stoch Crossover (can overlap)
+        if result.is_stoch_crossover:
+            categories['stoch_crossover'].append(result)
+            
+        # Bearish Break (warning)
+        if result.bearish_break:
+            categories['bearish_watch'].append(result)
+    
+    # Sort by score (highest first)
+    for key in categories:
+        categories[key] = sorted(categories[key], key=lambda x: x.score, reverse=True)
+    
+    return categories
+
+
 def has_any_signal(signals: Dict[str, List[ScanResult]]) -> bool:
     """Check if there are any signals to send"""
     return any(len(v) > 0 for v in signals.values())

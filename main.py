@@ -14,9 +14,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from config.settings import *
 from config.stocks_list import get_all_stocks, get_stock_count
 from core.data_fetcher import fetch_multiple_stocks
-from core.scanner import scan_all_stocks, filter_signals, has_any_signal
+from core.scanner import scan_all_stocks, filter_signals, filter_all_current_signals, has_any_signal
 from database.state_manager import StateManager
-from notifications.telegram_bot import send_all_alerts, send_startup_message, send_daily_recap_message
+from notifications.telegram_bot import send_all_alerts, send_startup_message, send_daily_recap_message, send_morning_recap_message
 
 # Setup logging
 # Ensure directories exist BEFORE setting up file handlers
@@ -52,6 +52,12 @@ def is_trading_hours() -> bool:
     end_time = TRADING_END_HOUR * 100 + TRADING_END_MINUTE
     
     return start_time <= current_time <= end_time
+
+
+def is_morning_scan_time() -> bool:
+    """Check if current time is morning scan time (08:00)"""
+    now = datetime.now(WIB)
+    return now.hour == 8 and now.minute <= 5
 
 
 def is_end_of_trading() -> bool:
@@ -212,6 +218,60 @@ def send_end_of_day_recap(state_manager: StateManager):
     send_daily_recap_message(daily_summary)
     
     logger.info("End-of-day recap sent!")
+    logger.info("="*50)
+
+
+def run_morning_scan(state_manager: StateManager):
+    """
+    Run morning scan at 08:00 AM.
+    Scans ALL stocks and sends recap of ALL matching signals (not just new).
+    This gives users a complete overview before market opens.
+    """
+    logger.info("="*50)
+    logger.info("MORNING SCAN - 08:00 OVERVIEW")
+    logger.info("="*50)
+    
+    # Get stock list
+    stocks = get_all_stocks()
+    logger.info(f"Morning scan: {len(stocks)} stocks...")
+    
+    # Fetch data
+    logger.info("Fetching data from Yahoo Finance...")
+    stock_data = fetch_multiple_stocks(stocks, period=DATA_PERIOD, interval=DATA_INTERVAL)
+    logger.info(f"Fetched data for {len(stock_data)} stocks")
+    
+    if len(stock_data) == 0:
+        logger.error("No data fetched. Aborting morning scan.")
+        return
+    
+    # Get previous states
+    previous_states = state_manager.get_all_states()
+    
+    # Scan all stocks
+    logger.info("Analyzing stocks for morning recap...")
+    results = scan_all_stocks(stock_data, previous_states)
+    
+    # Get ALL current matching signals (not filtering for new-only)
+    all_current_signals = filter_all_current_signals(results)
+    
+    # Count total signals
+    total_signals = sum(len(v) for v in all_current_signals.values())
+    
+    if total_signals == 0:
+        logger.info("No matching signals found in morning scan.")
+        return
+    
+    # Send morning recap message
+    logger.info(f"Sending morning recap with {total_signals} total signals...")
+    send_morning_recap_message(all_current_signals)
+    
+    # Update states
+    logger.info("Updating stock states...")
+    for ticker, result in results.items():
+        state_manager.update_from_scan_result(result)
+    state_manager.save()
+    
+    logger.info("Morning scan complete!")
     logger.info("="*50)
 
 

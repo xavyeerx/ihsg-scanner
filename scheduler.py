@@ -11,7 +11,7 @@ import os
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from main import run_scan, is_trading_hours, send_end_of_day_recap, is_end_of_trading
+from main import run_scan, is_trading_hours, send_end_of_day_recap, is_end_of_trading, run_morning_scan, is_morning_scan_time
 from database.state_manager import StateManager
 from notifications.telegram_bot import send_startup_message, send_telegram_message
 
@@ -32,6 +32,16 @@ state_manager = None
 def scheduled_scan():
     """Run scheduled scan"""
     global state_manager
+    
+    # Morning scan at 08:00 (before market opens)
+    if is_morning_scan_time():
+        logger.info("Morning scan time! Running full recap...")
+        try:
+            run_morning_scan(state_manager)
+        except Exception as e:
+            logger.error(f"Error during morning scan: {str(e)}")
+            send_telegram_message(f"⚠️ Morning Scan Error: {str(e)}")
+        return
     
     if not is_trading_hours():
         logger.info("Outside trading hours. Waiting...")
@@ -61,6 +71,7 @@ def main():
     logger.info("IHSG SUPERTREND SCANNER - SCHEDULER")
     logger.info("="*50)
     logger.info("Scan interval: 1 minute")
+    logger.info("Morning scan: 08:00 WIB")
     logger.info("Trading hours: 09:00 - 16:00 WIB")
     logger.info("="*50)
     
