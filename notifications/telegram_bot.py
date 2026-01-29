@@ -371,7 +371,7 @@ def send_daily_recap_message(daily_summary: dict):
 
 def send_morning_recap_message(signals: dict):
     """
-    Send morning recap message at 08:00 with ALL stocks matching screener criteria.
+    Send evening recap message at 18:00 with ALL stocks matching screener criteria.
     
     Args:
         signals: Dictionary with categories and list of ScanResult objects
@@ -379,7 +379,7 @@ def send_morning_recap_message(signals: dict):
     """
     lines = [
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
-        "☀️ <b>MORNING SCAN - 08:00</b>",
+        "🌙 <b>EVENING SCAN - 18:00</b>",
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
         f"⏰ {get_current_time_wib()}",
         ""
@@ -457,7 +457,7 @@ def send_morning_recap_message(signals: dict):
     # Footer
     lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━")
     lines.append(f"📊 Total: {total_signals} saham dalam radar")
-    lines.append("💡 <i>Scan lengkap sebelum market buka</i>")
+    lines.append("💡 <i>Scan lengkap setelah market tutup</i>")
     lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
     message = "\n".join(lines)

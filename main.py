@@ -54,10 +54,10 @@ def is_trading_hours() -> bool:
     return start_time <= current_time <= end_time
 
 
-def is_morning_scan_time() -> bool:
-    """Check if current time is morning scan time (08:00)"""
+def is_evening_scan_time() -> bool:
+    """Check if current time is evening scan time (18:00)"""
     now = datetime.now(WIB)
-    return now.hour == 8 and now.minute <= 5
+    return now.hour == 18 and now.minute <= 5
 
 
 def is_end_of_trading() -> bool:
@@ -221,14 +221,14 @@ def send_end_of_day_recap(state_manager: StateManager):
     logger.info("="*50)
 
 
-def run_morning_scan(state_manager: StateManager):
+def run_evening_scan(state_manager: StateManager):
     """
-    Run morning scan at 08:00 AM.
+    Run evening scan at 18:00 PM.
     Scans ALL stocks and sends recap of ALL matching signals (not just new).
-    This gives users a complete overview before market opens.
+    This gives users a complete overview after market closes.
     """
     logger.info("="*50)
-    logger.info("MORNING SCAN - 08:00 OVERVIEW")
+    logger.info("EVENING SCAN - 18:00 OVERVIEW")
     logger.info("="*50)
     
     # Get stock list
